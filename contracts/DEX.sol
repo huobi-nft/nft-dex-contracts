@@ -185,15 +185,18 @@ contract DEX {
         return singer;
     }
 
-    function checkOrder(FixedPriceOrder memory maker_order, address maker, address taker) public view {
+    function checkOrder(FixedPriceOrder memory maker_order, address maker, address taker) private view {
         IManager m = IManager(manager);
         uint256 min_price = m.allowedPayment(maker_order.tokens.ft);
-        require(maker != taker, "Taker can not be same as maker");
-        require(maker_order.maker == maker, "Maker nonce doesn't match");
-        require(maker_order.maker_nonce == userNonce[maker], "Maker nonce doesn't match");
-        require(maker_order.taker == address(0) || maker_order.taker == taker, "Taker is not allowed by maker");
         require(min_price != 0 && maker_order.tokens.ft_amount >= min_price, "FT contract is not supported or price is too low");
         require(m.allNftAllowed() || m.allowedNft(maker_order.tokens.nft), "NFT contract is not supported");
+
+        require(taker != address(0) && maker != address(0) && maker != taker, "Taker can not be same as maker");
+        require(maker_order.taker == address(0) || maker_order.taker == taker, "Taker is not allowed by maker");
+
+        require(maker_order.maker == maker, "Maker nonce doesn't match");
+        require(maker_order.maker_nonce == userNonce[maker], "Maker nonce doesn't match");
+
         require(maker_order.expire >= block.timestamp && block.timestamp >= maker_order.start, "Time error");
         require(maker_order.royalty_rate <= maxRoyaltyRate, "Royalty rate is too high");
     }
@@ -211,6 +214,7 @@ contract DEX {
         require(!finalizedOrder[maker_order_digest], "Order has been finalized or canceled");
         require(!canceledOrder[maker][maker_order_digest], "Order has been finalized or canceled");
         finalizedOrder[maker_order_digest] = true;
+        
         checkOrder(maker_order, maker, taker);
 
         transfer_nft(maker_order, maker, taker);
@@ -242,8 +246,10 @@ contract DEX {
         require(!canceledOrder[maker][maker_order_digest] && !canceledOrder[taker][taker_order_digest], "Order is finalized or canceled");
         finalizedOrder[maker_order_digest] = true;
         finalizedOrder[taker_order_digest] = true;
+
         checkOrder(maker_order, maker, taker);
 
+        require(taker_order.asset_recipient != address(0) && maker_order.asset_recipient != address(0), "Asset recipient is address(0)");
         require(maker != taker_order.asset_recipient && taker != maker_order.asset_recipient, "Transferring asset to oneself is not supported");
         if (maker_order.taker_get_nft) {
             transfer_nft(maker_order, maker, taker_order.asset_recipient);
@@ -359,7 +365,7 @@ contract DEX {
     ) external view returns (address user_proxy, uint256 ft_balance, uint256 ft_allowance, address nft_owner) {
         // nft_owner = address(0); // default
         // ft_allowance = 0; // default
-        require(user != address(0), "User address is 0");
+        require(user != address(0), "User address is address(0)");
         user_proxy = IRegistry(IManager(manager).registry()).proxies(user);
 
         if (ft != address(0)) {
