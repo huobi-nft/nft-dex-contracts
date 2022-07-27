@@ -367,7 +367,7 @@ contract DEX {
 
         if (ft != address(0)) {
             ft_balance = IERC20(ft).balanceOf(user);
-            ft_allowance = IERC20(ft).allowance(user, proxy);
+            ft_allowance = IERC20(ft).allowance(user, user_proxy);
         } else {
             ft_balance = user.balance;
         }
@@ -418,97 +418,4 @@ contract DEX {
     // openzeppelin/contracts/security/ReentrancyGuard.sol
 
 }
-
-/***
-
-    PreCheck(taker地址，X币种地址) => Taker的Proxy地址、X币种Approve给Proxy的额度，X币种当前余额
-    若 X币种地址 是 本币，addrss(0) , 返回的就是 Taker的Proxy地址、（0），本币当前余额
-
-
-
-    function checkOrderAndNFT(
-        bool maker_sells_nft,
-        address taker,
-        FixedPriceOrder memory order,
-        Sig memory maker_sig,
-        Sig memory taker_sig
-    ) external view returns(bytes32, bytes memory) {
-        (bytes32 order_digest, bytes memory order_bytes) = checkOrder(taker, order, maker_sig, taker_sig);
-
-        address nft_seller = order.maker;
-        address nft_buyer = taker;
-        if (!maker_sells_nft) {
-            nft_seller = taker;
-            nft_buyer = order.maker;
-        }
-
-        if (!CoNFT[order.nft_contract] || ILazyMint(order.nft_contract).exists(order.token_id)) {
-            address nft_owner = IERC721(order.nft_contract).ownerOf(order.token_id); // May Revert!!!
-            require(nft_owner == nft_seller, "The NFT seller is not the NFT owner");
-        }
-
-        try IERC721(order.nft_contract).supportsInterface(type(IERC2981).interfaceId) returns (bool support) {
-            if (support) {
-                checkRoyaltyInfo(order);
-            }
-        } catch {
-
-        }
-
-        uint256 approved_amount;
-        if (order.payment_token == address(0)) {
-            approved_amount = nft_buyer.balance;
-        } else {
-            approved_amount = IERC20(order.payment_token).allowance(nft_buyer, address(this));
-        }
-        require(approved_amount >= order.fixed_price, "NFT buyer's balance or approved-amount is not enough");
-
-        return (order_digest, order_bytes);
-    }
-
-
-    function orderStateWithDigest(address maker, address taker, uint256 order_nonce, bytes32 order_digest) public view returns(uint8) {
-        uint8 order_state = 0;
-        if (finalizedOrder[order_digest]) {
-            order_state = 1;
-        } else if (order_nonce != userNonce[maker]) {
-            order_state = 2;
-        } else if (canceledOrder[maker][order_digest]) {
-            order_state = 3;
-        } else if (canceledOrder[taker][order_digest]) {
-            order_state = 4;
-        }
-        return order_state;
-    }
-
-
-    function orderState(FixedPriceOrder memory order) external view returns(OrderQuery memory) {
-        bytes memory order_bytes = fixedPriceOrderEIP712Encode(order);
-        bytes32 order_digest = _hashTypedDataV4(keccak256(order_bytes));
-        uint8 order_state = orderStateWithDigest(order.maker, order.taker, order.maker_nonce, order_digest);
-        return OrderQuery(order_state, order_digest, order_bytes);
-    }
-
-    function recoverSingers(
-        FixedPriceOrder memory maker_order,
-        Sig memory maker_sig,
-        Sig memory taker_sig,
-        address taker_recipient
-    ) public view returns (address maker, address taker, bytes32 maker_order_digest, bytes32 taker_order_digest) {
-
-        FixedPriceOrder memory taker_order = maker_order;
-        taker_order.asset_recipient = taker_recipient;
-
-        bytes32 _HashTokens = _HashTokensForExchange(maker_order.tokens);
-        bytes memory maker_order_bytes = EIP712Encode(maker_order, _HashTokens);
-        bytes memory taker_order_bytes = EIP712Encode(taker_order, _HashTokens);
-
-        maker_order_digest = _hashTypedDataV4(keccak256(maker_order_bytes));
-        taker_order_digest = _hashTypedDataV4(keccak256(taker_order_bytes));
-
-        maker = checkSignature(maker_order_digest, maker_sig);
-        taker = checkSignature(taker_order_digest, taker_sig);
-    }
-
-***/
 
