@@ -189,11 +189,12 @@ contract DEX {
         IManager m = IManager(manager);
         uint256 min_price = m.allowedPayment(maker_order.tokens.ft);
         require(maker != taker, "Taker can not be same as maker");
+        require(maker_order.maker == maker, "Maker nonce doesn't match");
+        require(maker_order.maker_nonce == userNonce[maker], "Maker nonce doesn't match");
         require(maker_order.taker == address(0) || maker_order.taker == taker, "Taker is not allowed by maker");
         require(min_price != 0 && maker_order.tokens.ft_amount >= min_price, "FT contract is not supported or price is too low");
         require(m.allNftAllowed() || m.allowedNft(maker_order.tokens.nft), "NFT contract is not supported");
         require(maker_order.expire >= block.timestamp && block.timestamp >= maker_order.start, "Time error");
-        require(maker_order.maker_nonce == userNonce[maker], "Maker nonce doesn't match");
         require(maker_order.royalty_rate <= maxRoyaltyRate, "Royalty rate is too high");
     }
 
