@@ -354,6 +354,33 @@ contract DEX {
         return OrderQuery(order_state, order_digest, tokens_digest, order_bytes, tokens_bytes);
     }
 
+    function AppPreCheck(
+        address user,
+        address ft,
+        address nft,
+        uint256 nft_id
+    ) external view returns (address user_proxy, uint256 ft_balance, uint256 ft_allowance, address nft_owner) {
+        // nft_owner = address(0); // default
+        // ft_allowance = 0; // default
+        require(user != address(0), "User address is 0");
+        user_proxy = IRegistry(IManager(manager).registry()).proxies(user);
+
+        if (ft != address(0)) {
+            ft_balance = IERC20(ft).balanceOf(user);
+            ft_allowance = IERC20(ft).allowance(user, proxy);
+        } else {
+            ft_balance = user.balance;
+        }
+
+        if (nft != address(0)) {
+            try IERC721(nft).ownerOf(nft_id) returns (address owner) {
+                nft_owner = owner;
+            } catch {
+
+            }
+        }
+    }
+
     function _hashTypedDataV4(bytes32 structHash) internal view returns (bytes32) {
         return _toTypedDataHash(_domainSeparatorV4(), structHash);
     }
@@ -393,6 +420,11 @@ contract DEX {
 }
 
 /***
+
+    PreCheck(taker地址，X币种地址) => Taker的Proxy地址、X币种Approve给Proxy的额度，X币种当前余额
+    若 X币种地址 是 本币，addrss(0) , 返回的就是 Taker的Proxy地址、（0），本币当前余额
+
+
 
     function checkOrderAndNFT(
         bool maker_sells_nft,
