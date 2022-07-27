@@ -217,9 +217,15 @@ contract DEX {
         emit FixedPriceOrderMatched(msg.sender, maker, taker, maker_order_digest, bytes32(0), maker_order_bytes, "", tokens_bytes);
     }
 
-    function dexFixedPrice(FixedPriceOrder memory maker_order, Sig memory maker_sig, Sig memory taker_sig, address asset_recipient) external payable nonReentrant {
+    function dexFixedPrice(
+        FixedPriceOrder memory maker_order,
+        Sig memory maker_sig,
+        Sig memory taker_sig,
+        address taker_asset_recipient
+    ) external payable nonReentrant {
+
         FixedPriceOrder memory taker_order = orderClone(maker_order);
-        taker_order.asset_recipient = asset_recipient;
+        taker_order.asset_recipient = taker_asset_recipient;
 
         (bytes32 tokens_digest, bytes memory tokens_bytes) = _HashTokensForExchange(maker_order.tokens);
         bytes memory maker_order_bytes = EIP712Encode(maker_order, tokens_digest);
@@ -329,19 +335,20 @@ contract DEX {
         emit AllOrdersCancelled(msg.sender, nonce);
     }
 
-    function orderState(FixedPriceOrder memory maker_order) external view returns(OrderQuery memory) {
-        (bytes32 tokens_digest, bytes memory tokens_bytes) = _HashTokensForExchange(maker_order.tokens);
-        bytes memory order_bytes = EIP712Encode(maker_order, tokens_digest);
+    function orderState(FixedPriceOrder memory order, address taker) external view returns(OrderQuery memory) {
+        (bytes32 tokens_digest, bytes memory tokens_bytes) = _HashTokensForExchange(order.tokens);
+        bytes memory order_bytes = EIP712Encode(order, tokens_digest);
         bytes32 order_digest = _hashTypedDataV4(keccak256(order_bytes));
-        address maker = maker_order.maker;
 
         uint8 order_state = 0;
         if (finalizedOrder[order_digest]) {
             order_state = 1;
-        } else if (maker_order.maker_nonce != userNonce[maker]) {
+        } else if (order.maker_nonce != userNonce[order.maker]) {
             order_state = 2;
-        } else if (canceledOrder[maker][order_digest]) {
+        } else if (canceledOrder[order.maker][order_digest]) {
             order_state = 3;
+        } else if (canceledOrder[taker][order_digest]) {
+            order_state = 4;
         }
 
         return OrderQuery(order_state, order_digest, tokens_digest, order_bytes, tokens_bytes);
