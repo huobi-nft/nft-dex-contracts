@@ -89,8 +89,7 @@ contract MetaTx {
 
     function verify(address signer, MetaTransaction memory metaTx, uint8 sigV, bytes32 sigR, bytes32 sigS) internal view returns (bool) {
         require(signer != address(0), "NativeMetaTransaction: INVALID_SIGNER");
-        address s = ecrecover(toTypedMessageHash(hashMetaTransaction(metaTx)), sigV, sigR, sigS);
-        return s == signer;
+        return signer == ecrecover(toTypedMessageHash(hashMetaTransaction(metaTx)), sigV, sigR, sigS);
     }
 
     /**
