@@ -1,0 +1,16 @@
+.idea
+.DS_Store
+
+secrets.*
+secret.*
+
+node_modules
+
+single
+
+#Hardhat files
+cache
+artifacts
+.openzeppelin
+coverage.json
+coverage
