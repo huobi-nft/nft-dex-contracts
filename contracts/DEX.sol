@@ -275,7 +275,15 @@ contract DEX {
                 _transferFrom(order.tokens.nft, nft_owner, nft_recipient, order.tokens.nft_id);
             }
         } else {
-            checkNFT(order, nft_owner);
+            // ownerOf(tokenId) May Revert!!!
+            require(nft_owner == IERC721(order.tokens.nft).ownerOf(order.tokens.nft_id), "NFT owner doesn't match");
+            try IERC721(order.tokens.nft).supportsInterface(type(IERC2981).interfaceId) returns (bool support) {
+                if (support) {
+                    checkRoyaltyInfo(order);
+                }
+            } catch {
+
+            }
             _transferFrom(order.tokens.nft, nft_owner, nft_recipient, order.tokens.nft_id);
         }
     }
@@ -298,18 +306,6 @@ contract DEX {
             sendValue(payable(order.royalty_recipient), royalty_amount);
             sendValue(payable(feeRecipient), platform_amount);
             sendValue(payable(ft_owner), remain_amount);
-        }
-    }
-
-    function checkNFT(FixedPriceOrder memory order, address nft_seller) public view {
-        address nft_owner = IERC721(order.tokens.nft).ownerOf(order.tokens.nft_id); // May Revert!!!
-        require(nft_owner == nft_seller, "The NFT seller is not the NFT owner");
-        try IERC721(order.tokens.nft).supportsInterface(type(IERC2981).interfaceId) returns (bool support) {
-            if (support) {
-                checkRoyaltyInfo(order);
-            }
-        } catch {
-
         }
     }
 
