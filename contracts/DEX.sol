@@ -22,8 +22,10 @@ contract DEX {
 
     struct OrderQuery {
         uint8 state;
-        bytes32 digest;
-        bytes bys;
+        bytes32 order_digest;
+        bytes32 tokens_digest;
+        bytes order_bytes;
+        bytes tokens_bytes;
     }
 
     struct Sig {
@@ -87,8 +89,8 @@ contract DEX {
 
     function _HashTokensForExchange(TokensForExchange memory tokens) internal pure returns (bytes32, bytes memory) {
         bytes memory tokens_bytes = abi.encode(HashTokenStruct, tokens.nft, tokens.ft, tokens.nft_id, tokens.nft_amount, tokens.ft_amount);
-        bytes32 hash_tokens = keccak256(tokens_bytes);
-        return (hash_tokens, tokens_bytes);
+        bytes32 tokens_digest = keccak256(tokens_bytes);
+        return (tokens_digest, tokens_bytes);
     }
 
     // https://eips.ethereum.org/EIPS/eip-712#definition-of-hashstruct
@@ -200,8 +202,8 @@ contract DEX {
         require(maker_order.allow_cex, "Cex is not permitted by maker"); // onlyCex
         require(maker_order.taker_get_nft, "Taker should be the nft buyer");
 
-        (bytes32 hash_tokens, bytes memory tokens_bytes) = _HashTokensForExchange(maker_order.tokens);
-        bytes memory maker_order_bytes = EIP712Encode(maker_order, hash_tokens);
+        (bytes32 tokens_digest, bytes memory tokens_bytes) = _HashTokensForExchange(maker_order.tokens);
+        bytes memory maker_order_bytes = EIP712Encode(maker_order, tokens_digest);
         bytes32 maker_order_digest = _hashTypedDataV4(keccak256(maker_order_bytes));
         address maker = checkSignature(maker_order_digest, maker_sig);
 
@@ -219,9 +221,9 @@ contract DEX {
         FixedPriceOrder memory taker_order = orderClone(maker_order);
         taker_order.asset_recipient = asset_recipient;
 
-        (bytes32 hash_tokens, bytes memory tokens_bytes) = _HashTokensForExchange(maker_order.tokens);
-        bytes memory maker_order_bytes = EIP712Encode(maker_order, hash_tokens);
-        bytes memory taker_order_bytes = EIP712Encode(taker_order, hash_tokens);
+        (bytes32 tokens_digest, bytes memory tokens_bytes) = _HashTokensForExchange(maker_order.tokens);
+        bytes memory maker_order_bytes = EIP712Encode(maker_order, tokens_digest);
+        bytes memory taker_order_bytes = EIP712Encode(taker_order, tokens_digest);
 
         bytes32 maker_order_digest = _hashTypedDataV4(keccak256(maker_order_bytes));
         bytes32 taker_order_digest = _hashTypedDataV4(keccak256(taker_order_bytes));
@@ -327,27 +329,22 @@ contract DEX {
         emit AllOrdersCancelled(msg.sender, nonce);
     }
 
-    function orderStateWithDigest(address maker, address taker, uint256 order_nonce, bytes32 order_digest) public view returns(uint8) {
+    function orderState(FixedPriceOrder memory maker_order) external view returns(OrderQuery memory) {
+        (bytes32 tokens_digest, bytes memory tokens_bytes) = _HashTokensForExchange(maker_order.tokens);
+        bytes memory order_bytes = EIP712Encode(maker_order, tokens_digest);
+        bytes32 order_digest = _hashTypedDataV4(keccak256(order_bytes));
+        address maker = maker_order.maker;
+
         uint8 order_state = 0;
         if (finalizedOrder[order_digest]) {
             order_state = 1;
-        } else if (order_nonce != userNonce[maker]) {
+        } else if (maker_order.maker_nonce != userNonce[maker]) {
             order_state = 2;
         } else if (canceledOrder[maker][order_digest]) {
             order_state = 3;
-        } else if (canceledOrder[taker][order_digest]) {
-            order_state = 4;
         }
-        return order_state;
-    }
 
-    function orderState(FixedPriceOrder memory order) external view returns(OrderQuery memory) {
-        (bytes32 hash_tokens, bytes memory tokens_bytes) = _HashTokensForExchange(order.tokens);
-        bytes memory order_bytes = EIP712Encode(order, hash_tokens);
-        bytes32 order_digest = _hashTypedDataV4(keccak256(order_bytes));
-
-        uint8 order_state = orderStateWithDigest(order.maker, order.taker, order.maker_nonce, order_digest);
-        return OrderQuery(order_state, order_digest, order_bytes);
+        return OrderQuery(order_state, order_digest, tokens_digest, order_bytes, tokens_bytes);
     }
 
     function _hashTypedDataV4(bytes32 structHash) internal view returns (bytes32) {
