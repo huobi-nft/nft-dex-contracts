@@ -256,7 +256,7 @@ contract DEX {
         emit FixedPriceOrderMatched(msg.sender, maker, taker, maker_order_digest, taker_order_digest, maker_order_bytes, taker_order_bytes, tokens_bytes);
     }
 
-    function _transferFrom(address token_contract, address token_owner, address token_recipient, uint256 token_id_or_amount) private {
+    function _transfer(address token_contract, address token_owner, address token_recipient, uint256 token_id_or_amount) private {
         IProxy user_proxy = IProxy(IRegistry(IManager(manager).registry()).proxies(token_owner));
         require(address(user_proxy) != address(0), "User proxy is not existed");
         bytes memory call_data = abi.encodeWithSignature("transferFrom(address,address,uint256)", token_owner, token_recipient, token_id_or_amount);
@@ -272,7 +272,7 @@ contract DEX {
                 ILazyMint(order.tokens.nft).lazyMint(nft_recipient, order.tokens.nft_id, order.royalty_recipient, order.royalty_rate);
             } else {
                 checkRoyaltyInfo(order);
-                _transferFrom(order.tokens.nft, nft_owner, nft_recipient, order.tokens.nft_id);
+                _transfer(order.tokens.nft, nft_owner, nft_recipient, order.tokens.nft_id);
             }
         } else {
             // ownerOf(tokenId) May Revert!!!
@@ -284,7 +284,7 @@ contract DEX {
             } catch {
 
             }
-            _transferFrom(order.tokens.nft, nft_owner, nft_recipient, order.tokens.nft_id);
+            _transfer(order.tokens.nft, nft_owner, nft_recipient, order.tokens.nft_id);
         }
     }
 
@@ -295,9 +295,9 @@ contract DEX {
 
         if (order.tokens.ft != address(0)) {
             require(msg.value == 0, "Msg.value should be zero");
-            _transferFrom(order.tokens.ft, ft_owner, order.royalty_recipient, royalty_amount);
-            _transferFrom(order.tokens.ft, ft_owner, feeRecipient, platform_amount);
-            _transferFrom(order.tokens.ft, ft_owner, ft_recipient, remain_amount);
+            _transfer(order.tokens.ft, ft_owner, order.royalty_recipient, royalty_amount);
+            _transfer(order.tokens.ft, ft_owner, feeRecipient, platform_amount);
+            _transfer(order.tokens.ft, ft_owner, ft_recipient, remain_amount);
         } else {
             require(msg.value >= order.tokens.ft_amount, "Msg.value is not enough");
             if (msg.value > order.tokens.ft_amount) {
