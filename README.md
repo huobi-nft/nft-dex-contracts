@@ -1,4 +1,4 @@
-# Simple NFT DEX
+# NFT & DEX
 
 
 ```shell

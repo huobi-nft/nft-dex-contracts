@@ -49,13 +49,13 @@ async function main() {
         "Simple NFT DEX",
         "Version 0.1.0",
     ];
-    const SimpleDex = await ethers.getContractFactory('DEX');
-    console.log('Deploying SimpleDex...');
-    const dex = await SimpleDex.deploy();
+    const Dex = await ethers.getContractFactory('DEX');
+    console.log('Deploying Dex...');
+    const dex = await Dex.deploy();
     await dex.deployed();
-    console.log('SimpleDex deployed to:', dex.address);
+    console.log('Dex deployed to:', dex.address);
     await dex.initialize(...dex_args);
-    console.log('SimpleDex initialized.');
+    console.log('Dex initialized.');
     const dex_address = dex.address;
 
     const registry_args = [
@@ -74,8 +74,8 @@ async function main() {
 
     const nft_args = [
         manager_address,
-        "Simple NFT",
-        "SNFT",
+        "Huobi NFT",
+        "HuobiNFT",
         "https://www.nft.com/metadata/",
     ];
     const NFT = await ethers.getContractFactory('NFT');
@@ -163,67 +163,6 @@ main()
 
 /*
 
-
-Deploying Manager...
-Manager deployed to: 0x7AFA8913E28A05Ae34A1B9532E65066dF831febd
-Setting Operators...
-Deploying SimpleDex...
-SimpleDex deployed to: 0x800B9F8317b856AD8AA1E5A9Ef13Ab6657Fa65c1
-SimpleDex initialized.
-Deploying Registry...
-Registry deployed to: 0x65c1b4E78e8AC77122A57bf72fD45f6eEaF38Fc2
-Registry initialized.
-Deploying NFT...
-NFT deployed to: 0x1f09934DdeB4E7350e0601295B3f31aCd5AcAb82
-NFT initialized.
-Deploying MetaTx...
-MetaTx deployed to: 0x3Cb170c1c017fA7433A6AC7ddb576F581BA65433
-MetaTx initialized.
-
-Deploying Manager...
-Manager deployed to: 0xa6bf2B724826205Db32c8C0d17791Ed38d217447
-Setting Operators...
-Deploying SimpleDex...
-SimpleDex deployed to: 0x41D7A3Da975dbACef9B498D46c2Bd58677B8Ab12
-SimpleDex initialized.
-Deploying Registry...
-Registry deployed to: 0x1B0c06947a467F91BBdbc05d29D30D9E743cb327
-Registry initialized.
-Deploying NFT...
-NFT deployed to: 0x4110249B1a7f5db9be354Efa933fa0071cbE7514
-NFT initialized.
-Deploying MetaTx...
-MetaTx deployed to: 0x84886B685fd7a9Fc71d497BC32a8826F93e56c7E
-MetaTx initialized.
-
-Deploying Manager...
-Manager deployed to: 0x8DF0147f41D04c89097C0Eb070eaD41Ebc89b4b6
-Setting Operators...
-Deploying SimpleDex...
-SimpleDex deployed to: 0xD22609599e13B5E0cA824512EEC1BEcC4d14dD88
-SimpleDex initialized.
-Deploying Registry...
-Registry deployed to: 0x4CdCF102ac9F8C0eBe5be01b9E51238288210a30
-Registry initialized.
-Deploying NFT...
-NFT deployed to: 0x4c6Be3DF4B14dF316ba3BEdC30E2c88C36DB7B10
-NFT initialized.
-Deploying MetaTx...
-MetaTx deployed to: 0x6D99b7E1E632431c61051057B8408864a7971dF3
-MetaTx initialized.
-
-Deploying Manager...
-Manager deployed to: 0x17E0e91425952E87Bc25E2781629DC23e4E41898
-Setting Operators...
-Deploying SimpleDex...
-SimpleDex deployed to: 0xCB53c05a03522baA51d4Be1c6189F99040ED7F87
-SimpleDex initialized.
-Deploying Registry...
-Registry deployed to: 0x2864bccBA89aC95e0f654C39EAfbC82D56EA5d56
-Registry initialized.
-Deploying NFT...
-NFT deployed to: 0x87D57fa160F5879618EE865844Faaa39C1C840DF
-NFT initialized.
 
 Deploy Sequence
 0, Manager.sol & Manager.setOperators
