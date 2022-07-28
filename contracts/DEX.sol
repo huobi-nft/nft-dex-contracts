@@ -214,7 +214,7 @@ contract DEX {
         require(!finalizedOrder[maker_order_digest], "Order has been finalized or canceled");
         require(!canceledOrder[maker][maker_order_digest], "Order has been finalized or canceled");
         finalizedOrder[maker_order_digest] = true;
-        
+
         checkOrder(maker_order, maker, taker);
 
         transfer_nft(maker_order, maker, taker);

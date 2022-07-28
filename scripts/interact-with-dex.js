@@ -19,8 +19,8 @@ const chainId = 256; // HECO Testnet
 const rpcUrl = "https://http-testnet.hecochain.com"; // HECO Testnet
 
 
-const dexAddr = "0xc66Ad7Bb8CD46576A652991FBcBBE3C873470615";
-const nftAddr = "0xEf4835053B64FAE6e51753CAAe7f35DA2FB935Fd";
+const dexAddr = "0x37bbbec6cd25bb128887b39b1d9c922cddbd0987";
+const nftAddr = "0x83be785152a581e8F801B85e67CeC3820a614d40";
 const ftAddr = "0xC8e1F27BC788290aDc44a67D0F54b1eBc2533428";
 
 const nft_id = tokenId.toString();
@@ -31,7 +31,7 @@ const expire = start + 3*24*60*60;
 
 const makerOrder = {
     maker: "0x" + buffaloMaker.toString('hex'),
-    taker: "0x" + buffaloTaker.toString('hex'),
+    taker: "0x0000000000000000000000000000000000000000", // "0x" + buffaloTaker.toString('hex'),
     asset_recipient: '0x'+ buffaloMaker.toString('hex'),
     royalty_recipient: '0x'+ buffaloMaker.toString('hex'),
     royalty_rate: 50000,
@@ -51,7 +51,7 @@ const makerOrder = {
 
 const takerOrder = {
     maker: "0x" + buffaloMaker.toString('hex'),
-    taker: "0x" + buffaloTaker.toString('hex'),
+    taker: "0x0000000000000000000000000000000000000000", // "0x" + buffaloTaker.toString('hex'),
     asset_recipient: '0x'+ buffaloTaker.toString('hex'),
     royalty_recipient: '0x'+ buffaloMaker.toString('hex'),
     royalty_rate: 50000,
