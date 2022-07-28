@@ -107,7 +107,13 @@ async function interactWithContract() {
     const dex = SimpleDex.attach(dexAddr);
 
 
-    // TODO query taker's proxy and approved amount of USDC
+    // TODO check & query
+    // 1 taker has proxy ?
+    // 2 taker approved enough amount of ft ?
+    // 3 taker has enough balance of ft ?
+    // 4 maker has proxy ?
+    // 5 maker approved all nft_id for proxy ?
+    // 6 maker has this nft_id (owner of the nft_id) ?
 
 
     const ret = await dex.connect(signer).dexFixedPrice(
