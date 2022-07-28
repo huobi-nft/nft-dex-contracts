@@ -1,7 +1,8 @@
 const hre = require("hardhat");
 const ethers = hre.ethers;
 const chai = require("chai");
-const { ZERO_ADDRESS, initAccounts, deployContracts } = require("./helper");
+const { ZERO_ADDRESS, initAccounts, deployContracts, increaseTime } = require("./helper");
+const {BigNumber} = require("ethers");
 const expect = chai.expect;
 describe("Test  proxy", async function () {
   before("Init accounts", initAccounts);
@@ -161,7 +162,13 @@ describe("Test  proxy", async function () {
 
         await this.registry
           .connect(this.dao)
-          .setDestination(this.delegateProxy.address, true);
+          .startGrantDelegateCall(this.delegateProxy.address);
+
+        await increaseTime(BigNumber.from(11));
+
+        await this.registry
+            .connect(this.dao)
+            .endGrantDelegateCall(this.delegateProxy.address);
 
         await this.proxy
           .connect(this.proxyOwner)

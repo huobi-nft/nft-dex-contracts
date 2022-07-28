@@ -17,8 +17,12 @@ contract Registry is IRegistry {
     event StartGrantAuthentication(address addr);
     event EndGrantAuthentication(address addr);
     event RevokeAuthentication(address addr);
+
+    event StartGrantDelegateCall(address addr);
+    event EndGrantDelegateCall(address addr);
+    event RevokeDelegateCall(address addr);
+
     event ProxyOfUser(address[] user_array, address[] proxy_array);
-    event SetDestination(address addr, bool flag);
 
     modifier onlyOperator() {
         require(IManager(manager).operators(msg.sender), "Caller is not an operator");
@@ -41,10 +45,26 @@ contract Registry is IRegistry {
         manager = _manager;
     }
 
-    function setDestination(address dest, bool flag) external onlyOperator {
-        if (destinations[dest] != flag) {
-            destinations[dest] = flag;
-            emit SetDestination(dest, flag);
+    function startGrantDelegateCall(address addr) external onlyOperator {
+        require(!contracts[addr] && pending[addr] == 0, "Contract is already allowed in registry, or pending");
+        pending[addr] = block.timestamp;
+        emit StartGrantAuthentication(addr);
+    }
+
+    function endGrantDelegateCall(address addr) external onlyOperator {
+        require(
+            !contracts[addr] && pending[addr] != 0 && ((pending[addr] + DELAY_PERIOD) < block.timestamp),
+            "Contract is no longer pending or has already been approved by registry"
+        );
+        pending[addr] = 0;
+        destinations[addr] = true;
+        emit EndGrantDelegateCall(addr);
+    }
+
+    function revokeDelegateCall(address addr) external onlyOperator {
+        if (destinations[addr]) {
+            delete destinations[addr];
+            emit RevokeDelegateCall(addr);
         }
     }
 
