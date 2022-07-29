@@ -202,7 +202,7 @@ contract DEX {
     }
 
     // If msg.sender is CEX operator, no need to transfer FT/ERC20
-    function cexFixedPrice(FixedPriceOrder memory maker_order, Sig memory maker_sig, address taker) external onlyOperator nonReentrant {
+    function cexFixedPrice(FixedPriceOrder memory maker_order, Sig memory maker_sig, address taker) external onlyOperator {
         require(maker_order.allow_cex, "Cex is not permitted by maker"); // onlyCex
         require(maker_order.taker_get_nft, "Taker should be the nft buyer");
 
