@@ -89,7 +89,7 @@ contract MetaTx {
 
     function verify(address signer, MetaTransaction memory metaTx, uint8 sigV, bytes32 sigR, bytes32 sigS) internal view returns (bool) {
         require(signer != address(0), "NativeMetaTransaction: INVALID_SIGNER");
-        return signer == ecrecover(toTypedMessageHash(hashMetaTransaction(metaTx)), sigV, sigR, sigS);
+        return signer == ecrecover(_hashTypedDataV4(hashMetaTransaction(metaTx)), sigV, sigR, sigS);
     }
 
     /**
@@ -99,16 +99,14 @@ contract MetaTx {
     * "\\x19" makes the encoding deterministic
     * "\\x01" is the version byte to make it compatible to EIP-191
     */
-    function toTypedMessageHash(bytes32 messageHash) internal view returns (bytes32){
-        return keccak256(abi.encodePacked("\x19\x01", _domainSeparatorV4(), messageHash));
+    function _hashTypedDataV4(bytes32 structHash) internal view returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19\x01", _domainSeparatorV4(), structHash));
     }
 
-    /**
-    * @dev Returns the domain separator for the current chain.
-     */
     function _domainSeparatorV4() internal view returns (bytes32) {
         return keccak256(abi.encode(HashEIP712Domain, HashEIP712Name, HashEIP712Version, block.chainid, address(this)));
     }
+
 
 }
 

@@ -385,11 +385,7 @@ contract DEX {
     }
 
     function _hashTypedDataV4(bytes32 structHash) internal view returns (bytes32) {
-        return _toTypedDataHash(_domainSeparatorV4(), structHash);
-    }
-
-    function _toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
+        return keccak256(abi.encodePacked("\x19\x01", _domainSeparatorV4(), structHash));
     }
 
     function _domainSeparatorV4() internal view returns (bytes32) {
