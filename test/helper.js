@@ -98,6 +98,8 @@ async function deployContracts() {
 
   await this.registry.connect(this.proxyOwner).registerProxyOverride();
 
+  await this.manager.connect(this.dao).setRegistry(this.registry.address);
+
   const proxyAddress = await this.registry.proxies(this.proxyOwner.address);
 
   this.Proxy = await ethers.getContractFactory("Proxy");
