@@ -21,7 +21,7 @@ contract NFT is IERC721, IERC721Metadata, IERC2981, ILazyMint {
         uint96 royaltyRate;
     }
     mapping(uint256 => RoyaltyInfo) private _royaltyInfo; // TokenID => RoyaltyInfo
-    event RoyaltyInfoSet(uint256 indexed tokenId, address receiver, uint96 royaltyRate);
+    event RoyaltyInfoSet(uint256 indexed tokenId, address sender, address receiver, uint96 royaltyRate);
 
     mapping(uint256 => address) private _owners;
     mapping(address => uint256) private _balances;
@@ -105,7 +105,7 @@ contract NFT is IERC721, IERC721Metadata, IERC2981, ILazyMint {
         manager = _manager;
     }
 
-    function setNameAndSymbol(string memory nft_name, string memory nft_symbol) external onlyOperator {
+    function setNameAndSymbol(string memory nft_name, string memory nft_symbol) external onlyDAO {
         name = nft_name;
         symbol = nft_symbol;
     }
@@ -126,7 +126,7 @@ contract NFT is IERC721, IERC721Metadata, IERC2981, ILazyMint {
 
     function _setRoyaltyInfo(uint256 tokenId, address receiver, uint96 royaltyRate) private {
         _royaltyInfo[tokenId] = RoyaltyInfo(receiver, royaltyRate);
-        emit RoyaltyInfoSet(tokenId, receiver, royaltyRate);
+        emit RoyaltyInfoSet(tokenId, _msgSender(), receiver, royaltyRate);
     }
 
     function setRoyaltyInfo(uint256 tokenId, address receiver, uint96 royaltyRate) public {
