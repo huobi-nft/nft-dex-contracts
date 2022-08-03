@@ -3,7 +3,9 @@ const {ethers} = require("hardhat");
 
 async function main() {
 
-    const DAO_address = "0x62e5ff80d462baa336bc7ee6a4fdd4516acf94a1";
+    // const DAO_address = "0x62e5ff80d462baa336bc7ee6a4fdd4516acf94a1";
+    const DAO_address = "0xe0d2F3AfDB8058615bE5f7D77D2ce1536e965Db5";
+
     const FEE_recipient = DAO_address;
 
     let ret;
@@ -41,7 +43,7 @@ async function main() {
         "0x073fedbd64d2219f2b7e05d82838fe861dfeca57",
         "0xee016c72cab0cff916060299e95db2c4ce32f6f4",
     ];
-    await manager.setOperators(operators, true);
+    // await manager.setOperators(operators, true);
 
     const dex_args = [
         manager_address,

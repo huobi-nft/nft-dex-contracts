@@ -46,14 +46,14 @@ contract Registry is IRegistry {
     }
 
     function startGrantDelegateCall(address addr) external onlyOperator {
-        require(!contracts[addr] && pending[addr] == 0, "Contract is already allowed in registry, or pending");
+        require(!destinations[addr] && pending[addr] == 0, "Contract is already allowed in registry, or pending");
         pending[addr] = block.timestamp;
-        emit StartGrantAuthentication(addr);
+        emit StartGrantDelegateCall(addr);
     }
 
     function endGrantDelegateCall(address addr) external onlyOperator {
         require(
-            !contracts[addr] && pending[addr] != 0 && ((pending[addr] + DELAY_PERIOD) < block.timestamp),
+            !destinations[addr] && pending[addr] != 0 && ((pending[addr] + DELAY_PERIOD) < block.timestamp),
             "Contract is no longer pending or has already been approved by registry"
         );
         pending[addr] = 0;

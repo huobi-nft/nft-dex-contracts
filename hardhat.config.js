@@ -47,7 +47,7 @@ module.exports = {
       url: "https://http-mainnet.hecochain.com",
       chainId: 128,
       gas: 3000000,
-      gasPrice: 2000000000, // 2Gwei
+      gasPrice: 3000000000, // 2Gwei
       // accounts: {mnemonic: mnemonic},
       accounts: [privateKey],
     },
