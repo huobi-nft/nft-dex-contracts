@@ -14,6 +14,7 @@ contract Manager is IManager {
     mapping(address => bool) public allowedNft;
     bool public allNftAllowed;
     mapping(address => uint256) public allowedPayment;
+    mapping(address => bool) public allowedReceive;
 
     constructor (address dao) {
         DAO = dao;
@@ -69,7 +70,11 @@ contract Manager is IManager {
     }
 
     function setPaymentAllowed(address addr, uint256 min_price) external onlyOperator {
-        allowedPayment[addr] = min_price; // min_price == 0 to delete allowedPayment[_contract];
+        allowedPayment[addr] = min_price; // min_price == 0 to delete allowedPayment[erc20_contract];
+    }
+
+    function setReceiveAllowed(address addr, bool flag) external onlyOperator {
+        allowedReceive[addr] = flag;
     }
 
 }

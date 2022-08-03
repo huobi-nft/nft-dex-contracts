@@ -29,6 +29,7 @@ contract Proxy is IProxy {
     }
 
     function receiveApproval(address from, uint256 value, address token, bytes memory extraData) public {
+        require(IManager(IRegistry(registry).manager()).allowedReceive(token), "This ERC20 token is not supported");
         require(IERC20(token).transferFrom(from, address(this), value), "ERC20 token transfer failed");
         emit ReceivedTokens(from, value, token, extraData);
     }

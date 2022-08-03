@@ -17,6 +17,7 @@ interface IManager {
     function CoDEX(address addr) external view returns (bool);
     function CoNFT(address addr) external view returns (bool);
     function allowedPayment(address addr) external view returns (uint256);
+    function allowedReceive(address addr) external view returns (bool);
     function allowedNft(address addr) external view returns (bool);
     function allNftAllowed() external view returns (bool);
 }
@@ -31,6 +32,7 @@ interface IRegistry {
     function proxies(address addr) external view returns (address);
     function contracts(address addr) external view returns (bool);
     function destinations(address addr) external view returns (bool);
+    function manager() external view returns (address);
 }
 
 interface IProxy {
