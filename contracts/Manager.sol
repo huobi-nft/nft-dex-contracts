@@ -75,19 +75,3 @@ contract Manager is IManager {
 }
 
 
-/*
-
-Deploy Sequence
-0, Manager.sol & manger.setOperators
-1, TokenID.sol
-2, DEX.sol
-3, Registry.sol
-4, NFT.sol
-
-5, nft.setRegsitry
-6, nft.setCoDEX
-7, dex.setRegsitry
-8, dex.setCoNFT & dex.setPaymentAllowed
-
-
-*/
