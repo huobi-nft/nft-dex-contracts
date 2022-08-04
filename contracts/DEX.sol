@@ -252,6 +252,7 @@ contract DEX {
 
         require(taker_order.asset_recipient != address(0) && maker_order.asset_recipient != address(0), "Asset recipient is address(0)");
         require(maker != taker_order.asset_recipient && taker != maker_order.asset_recipient, "Transferring asset to oneself is not supported");
+        require(taker_order.asset_recipient.code.length == 0 && maker_order.asset_recipient.code.length == 0, "Contract recipient is not supported");
         if (maker_order.taker_get_nft) {
             transfer_nft(maker_order, maker, taker_order.asset_recipient);
             transfer_ft(maker_order, taker, maker_order.asset_recipient);
@@ -265,7 +266,6 @@ contract DEX {
     }
 
     function _transfer(address token_contract, address token_owner, address token_recipient, uint256 token_id_or_amount) private {
-        require(token_recipient.code.length == 0, "Contract recipient is not supported");
         IProxy user_proxy = IProxy(IRegistry(IManager(manager).registry()).proxies(token_owner));
         require(address(user_proxy) != address(0), "User proxy is not existed");
         bytes memory call_data = abi.encodeWithSignature("transferFrom(address,address,uint256)", token_owner, token_recipient, token_id_or_amount);
@@ -314,7 +314,7 @@ contract DEX {
             }
             sendValue(payable(order.royalty_recipient), royalty_amount);
             sendValue(payable(feeRecipient), platform_amount);
-            sendValue(payable(ft_owner), remain_amount);
+            sendValue(payable(ft_recipient), remain_amount);
         }
     }
 
