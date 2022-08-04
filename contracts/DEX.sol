@@ -138,10 +138,10 @@ contract DEX {
         _;
     }
 
-    function initialize(address _manager, address _fee_recipient, string memory _name, string memory _version) external {
+    function initialize(address _manager, address _feeRecipient, string memory _name, string memory _version) external {
         require(!initialized, "Contract was initialized");
         initialized = true;
-        feeRecipient = _fee_recipient;
+        feeRecipient = _feeRecipient;
         manager = _manager;
         name = _name;
         version = _version;
@@ -153,24 +153,24 @@ contract DEX {
         feeRate = 20000000;  // 20,000,000 / 1,000,000,000 == 2%
     }
 
-    function setNameVersion(string memory _name, string memory _version) external onlyOperator {
+    function setNameVersion(string memory _name, string memory _version) external onlyDAO {
         name = _name;
         version = _version;
         HashEIP712Name = keccak256(bytes(name));
         HashEIP712Version = keccak256(bytes(version));
     }
 
-    function setFeeRate(uint256 _feeRate) external onlyOperator {
+    function setFeeRate(uint256 _feeRate) external onlyDAO {
         require(_feeRate <= feeDenominator, "Fee rate is too high");
         feeRate = _feeRate;
     }
 
-    function setFeeRecipient(address _feeRecipient) external onlyOperator {
-        require(_feeRecipient != address(0), "Fee recipient rate is address(0)");
+    function setFeeRecipient(address _feeRecipient) external onlyDAO {
+        require(_feeRecipient != address(0), "Fee recipient is address(0)");
         feeRecipient = _feeRecipient;
     }
 
-    function setMaxRoyaltyRate(uint256 _maxRoyaltyRate) external onlyOperator {
+    function setMaxRoyaltyRate(uint256 _maxRoyaltyRate) external onlyDAO {
         require(_maxRoyaltyRate <= feeDenominator, "Royalty rate is too high");
         maxRoyaltyRate = _maxRoyaltyRate;
     }
