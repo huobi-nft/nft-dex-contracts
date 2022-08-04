@@ -62,10 +62,10 @@ contract Registry is IRegistry {
     }
 
     function revokeDelegateCall(address addr) external onlyOperator {
-        if (destinations[addr]) {
-            delete destinations[addr];
-            emit RevokeDelegateCall(addr);
-        }
+        require(destinations[addr], "Not in destinations");
+        delete destinations[addr];
+        emit RevokeDelegateCall(addr);
+
     }
 
     function startGrantAuthentication(address addr) external onlyOperator {
