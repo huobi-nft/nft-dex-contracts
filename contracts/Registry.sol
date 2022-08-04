@@ -85,10 +85,9 @@ contract Registry is IRegistry {
     }
 
     function revokeAuthentication(address addr) external onlyOperator {
-        if (contracts[addr]) {
-            delete contracts[addr];
-            emit RevokeAuthentication(addr);
-        }
+        require(contracts[addr], "Not in destinations");
+        delete contracts[addr];
+        emit RevokeAuthentication(addr);
     }
 
     function registerProxyOverride() external returns (address) {
