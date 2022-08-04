@@ -218,6 +218,7 @@ contract DEX {
 
         checkOrder(maker_order, maker, taker);
 
+        require(taker.code.length == 0, "Contract recipient is not supported");
         transfer_nft(maker_order, maker, taker);
 
         emit FixedPriceOrderMatched(msg.sender, maker, taker, maker_order_digest, bytes32(0), maker_order_bytes, "", tokens_bytes);
@@ -250,9 +251,14 @@ contract DEX {
 
         checkOrder(maker_order, maker, taker);
 
-        require(taker_order.asset_recipient != address(0) && maker_order.asset_recipient != address(0), "Asset recipient is address(0)");
+        require(
+            taker_order.asset_recipient != address(0) &&
+            maker_order.asset_recipient != address(0) &&
+            taker_order.asset_recipient.code.length == 0 &&
+            maker_order.asset_recipient.code.length == 0,
+            "Asset recipient is address(0) or contract"
+        );
         require(maker != taker_order.asset_recipient && taker != maker_order.asset_recipient, "Transferring asset to oneself is not supported");
-        require(taker_order.asset_recipient.code.length == 0 && maker_order.asset_recipient.code.length == 0, "Contract recipient is not supported");
         if (maker_order.taker_get_nft) {
             transfer_nft(maker_order, maker, taker_order.asset_recipient);
             transfer_ft(maker_order, taker, maker_order.asset_recipient);
