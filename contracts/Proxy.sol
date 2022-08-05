@@ -28,20 +28,20 @@ contract Proxy is IProxy {
         emit ReceivedEther(msg.sender, msg.value);
     }
 
-    function receiveApproval(address from, uint256 value, address token, bytes memory extraData) public {
+    function receiveApproval(address from, uint256 value, address token, bytes memory extraData) external {
         require(IManager(IRegistry(registry).manager()).allowedReceive(token), "This ERC20 token is not supported");
         require(IERC20(token).transferFrom(from, address(this), value), "ERC20 token transfer failed");
         emit ReceivedTokens(from, value, token, extraData);
     }
 
-    function setRevoke(bool revoke) public {
+    function setRevoke(bool revoke) external {
         require(msg.sender == owner, "Proxy can only be revoked by its owner");
         revoked = revoke;
         emit RevokeSet(revoke);
     }
 
     // Proxy.proxy(...data is Registry.transferAccessTo) -> Registry.transferAccessTo(...) -> Proxy.transferOwnership
-    function transferOwnership(address new_owner) public {
+    function transferOwnership(address new_owner) external {
         require(msg.sender == registry, "Ownership can only be changed through registry");
         require(new_owner != address(0) && new_owner != owner, "New owner is zero address or the same as current");
         owner = new_owner;
@@ -63,7 +63,7 @@ contract Proxy is IProxy {
         return result;
     }
 
-    function proxyAssert(address target, bool delegate, uint256 some_value, bytes memory data) public {
+    function proxyAssert(address target, bool delegate, uint256 some_value, bytes memory data) external {
         require(proxy(target, delegate, some_value, data), "Proxy assertion failed");
     }
 
