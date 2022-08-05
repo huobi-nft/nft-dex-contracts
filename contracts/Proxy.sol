@@ -40,9 +40,10 @@ contract Proxy is IProxy {
         emit RevokeSet(revoke);
     }
 
+    // Proxy.proxy(...data is Registry.transferAccessTo) -> Registry.transferAccessTo(...) -> Proxy.transferOwnership
     function transferOwnership(address new_owner) public {
         require(msg.sender == registry, "Ownership can only be changed through registry");
-        require(new_owner != address(0), "New owner is zero address");
+        require(new_owner != address(0) && new_owner != owner, "New owner is zero address");
         owner = new_owner;
     }
 

@@ -115,6 +115,8 @@ contract Registry is IRegistry {
         emit ProxyOfUser(user_array, proxy_array);
     }
 
+    // Proxy.proxy(...data is Registry.transferAccessTo) -> Registry.transferAccessTo(...) -> Proxy.transferOwnership
+    // Proxy.transferOwnership require( owner != new_owner), that means from != to
     function transferAccessTo(address from, address to) external {
         address proxy = proxies[from];
         require(proxy == msg.sender, "Proxy transfer can only be called by the proxy");
@@ -122,6 +124,15 @@ contract Registry is IRegistry {
         proxies[to] = proxy;
         delete proxies[from];
         IProxy(proxy).transferOwnership(to);
+
+        address[] memory user_array = new address[](2);
+        address[] memory proxy_array = new address[](2);
+        user_array[0] = from;
+        user_array[1] = to;
+        proxy_array[0] = address(0);
+        proxy_array[1] = proxy;
+
+        emit ProxyOfUser(user_array, proxy_array);
     }
 
 }
