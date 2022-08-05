@@ -126,7 +126,7 @@ contract NFT is IERC721, IERC721Metadata, IERC2981, ILazyMint {
 
     function _setRoyaltyInfo(uint256 tokenId, address receiver, uint96 royaltyRate) private {
         _royaltyInfo[tokenId] = RoyaltyInfo(receiver, royaltyRate);
-        emit RoyaltyInfoSet(tokenId, _msgSender(), receiver, royaltyRate);
+        emit RoyaltyInfoSet(tokenId, msg.sender, receiver, royaltyRate);
     }
 
     function setRoyaltyInfo(uint256 tokenId, address receiver, uint96 royaltyRate) public {
