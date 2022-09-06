@@ -1,10 +1,9 @@
-
 const {ethers} = require("hardhat");
 
 async function main() {
 
-    // const DAO_address = "0x62e5ff80d462baa336bc7ee6a4fdd4516acf94a1";
-    const DAO_address = "0xe0d2F3AfDB8058615bE5f7D77D2ce1536e965Db5";
+    // const DAO_address = "0x6b099Bfb494c589fb9514101Cd5979E507574490";
+    const DAO_address = "0x6b099Bfb494c589fb9514101Cd5979E507574490";
 
     const FEE_recipient = DAO_address;
 
@@ -43,7 +42,7 @@ async function main() {
         "0x073fedbd64d2219f2b7e05d82838fe861dfeca57",
         "0xee016c72cab0cff916060299e95db2c4ce32f6f4",
     ];
-    // await manager.setOperators(operators, true);
+     await manager.setOperators(operators, true);
 
     const dex_args = [
         manager_address,
@@ -115,44 +114,42 @@ async function main() {
     ret = await manager.setCoNFT(nft_address, true);
     // console.log("ret -> ", ret);
 
-    const usdc_address = "0xC8e1F27BC788290aDc44a67D0F54b1eBc2533428";
-    ret = await manager.setPaymentAllowed(usdc_address, 1000000);
+    // const usdc_address = "0xC8e1F27BC788290aDc44a67D0F54b1eBc2533428";
+    // ret = await manager.setPaymentAllowed(usdc_address, 1000000);
     // console.log("ret -> ", ret);
 
     const buffaloMaker = "0x938c137dab3b12ac6622a0109a5af60ad47e3608";
-    const buffaloTaker = "0x62e5ff80d462baa336bc7ee6a4fdd4516acf94a1";
+    const buffaloTaker = "0x6b099Bfb494c589fb9514101Cd5979E507574490";
 
     ret = await registry.registerProxyFor([buffaloMaker, buffaloTaker]);
     // console.log("ret -> ", ret);
 
 
-
-    /*
-        const token_id_args = [
-            "0x62e5ff80d462baa336bc7ee6a4fdd4516acf94a1",
+    const token_id_args = [
+            "0x6b099Bfb494c589fb9514101Cd5979E507574490",
         ];
-        const TokenID = await ethers.getContractFactory('TokenID');
-        console.log('Deploying TokenID...');
-        const token_id = await TokenID.deploy(...token_id_args);
-        await token_id.deployed();
-        console.log('TokenID deployed to:', token_id.address);
+    const TokenID = await ethers.getContractFactory('TokenID');
+    console.log('Deploying TokenID...');
+    const token_id = await TokenID.deploy(...token_id_args);
+    await token_id.deployed();
+    console.log('TokenID deployed to:', token_id.address);
 
 
-        const usdc_args = [
-            6,
-            "USD Coin",
-            "USDC",
-        ];
-        const USDC = await ethers.getContractFactory('USDC');
-        console.log('Deploying USDC...');
-        const usdc = await USDC.deploy(...usdc_args);
-        await usdc.deployed();
-        await usdc.mint("0x62e5ff80d462baa336bc7ee6a4fdd4516acf94a1", 1000000000000);
-        console.log('USDC deployed to:', usdc.address);
+    const usdc_args = [
+            18,
+            "USDT Coin",
+            "USDT",
+    ];
+    const USDC = await ethers.getContractFactory('USDC');
+    console.log('Deploying USDC...');
+    const usdc = await USDC.deploy(...usdc_args);
+    await usdc.deployed();
+    await usdc.mint("0x6b099Bfb494c589fb9514101Cd5979E507574490", 1000000000000);
+    console.log('USDT deployed to:', usdc.address);
 
-        console.log('Done!');
+    ret = await manager.setPaymentAllowed(usdc.address, 1000000000000000000);
 
-    */
+    console.log('Done!');
 
 }
 
