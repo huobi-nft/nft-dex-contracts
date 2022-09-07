@@ -332,20 +332,15 @@ contract DEX {
         }
     }
 
-    function cancelOrder(bytes32 order_digest) external {
-        require(!finalizedOrder[order_digest], "Order is finalized");
-        canceledOrder[msg.sender][order_digest] = true;
+    function cancelOrders(bytes32[]  memory order_digests) external {
+        for(uint256 i = 0; i < order_digests.length; i++){
+            require(!finalizedOrder[order_digests[i]], "Order is finalized");
+            canceledOrder[msg.sender][order_digests[i]] = true;
 
-        emit OrderCancelled(msg.sender, order_digest);
+            emit OrderCancelled(msg.sender, order_digests[i]);
+        }
     }
-
-    function cancelAllOrders() external {
-        ++userNonce[msg.sender];
-        uint256 nonce = userNonce[msg.sender];
-
-        emit AllOrdersCancelled(msg.sender, nonce);
-    }
-
+    
     function orderState(FixedPriceOrder memory order, address taker) external view returns(OrderQuery memory) {
         (bytes32 tokens_digest, bytes memory tokens_bytes) = _HashTokensForExchange(order.tokens);
         bytes memory order_bytes = EIP712Encode(order, tokens_digest);
