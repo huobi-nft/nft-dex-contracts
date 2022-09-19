@@ -10,6 +10,7 @@ contract Registry is IRegistry {
     mapping(address => bool) public destinations; // contracts which user_proxy.proxy(...) can call
     mapping(address => uint) public pending;
 
+    address public proxyHub;
     uint64 public DELAY_PERIOD;
     bool public initialized;
     address public manager;
@@ -34,7 +35,7 @@ contract Registry is IRegistry {
         _;
     }
 
-    function initialize(address _manager, address dex, uint64 delay_period) external {
+    function initialize(address _manager, address dex, uint64 delay_period,address _proxyHub) external {
         require(!initialized, "Contract was initialized");
         initialized = true;
         contracts[dex] = true;
@@ -43,6 +44,12 @@ contract Registry is IRegistry {
             DELAY_PERIOD = 2 weeks;
         }
         manager = _manager;
+        proxyHub = _proxyHub;
+    }
+
+    function setProxyHub(address _proxyHub) external onlyDAO {
+        require(_proxyHub != address(0),"ProxyHub can not be 0");
+        proxyHub = _proxyHub;
     }
 
     function startGrantDelegateCall(address addr) external onlyOperator {
@@ -91,14 +98,13 @@ contract Registry is IRegistry {
     }
 
     function registerProxyOverride() external returns (address) {
-        address proxy = address(new Proxy(msg.sender, address(this)));
-        proxies[msg.sender] = proxy;
+        proxies[msg.sender] = proxyHub;
         address[] memory user_array = new address[](1);
         address[] memory proxy_array = new address[](1);
         user_array[0] = msg.sender;
-        proxy_array[0] = proxy;
+        proxy_array[0] = proxyHub;
         emit ProxyOfUser(user_array, proxy_array);
-        return proxy;
+        return proxyHub;
     }
 
     function registerProxyFor(address[] memory user_array) external {
@@ -107,8 +113,7 @@ contract Registry is IRegistry {
             address user_i = user_array[i];
             address proxy_i = proxies[user_i];
             if (proxy_i == address(0)) {
-                proxy_i = address(new Proxy(user_i, address(this)));
-                proxies[user_i] = proxy_i;
+                proxies[user_i] = proxyHub;
             }
             proxy_array[i] = proxy_i;
         }
